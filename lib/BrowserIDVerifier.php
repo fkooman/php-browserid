@@ -73,17 +73,7 @@ class BrowserIDVerifier {
     }
 
     public static function getAuthUri() {
-
-//mixed substr_replace ( mixed $string , mixed $replacement , mixed $start [, mixed $length ] )
-
         $pathInfo = substr(dirname(__DIR__), strlen($_SERVER['DOCUMENT_ROOT']));
-
-  //      DocumentRoot /var/www/html
-    //    RequestUri /tmp/index.php
-      //  ScriptName /var/www/html/browserid/index.php
-
-//        $pathInfo = substr_replace($_SERVER['REQUEST_URI'], '', 0, strlen($_SERVER['SCRIPT_NAME']));
-  //      error_log($pathInfo);
         if (strpos($pathInfo, '?') !== FALSE) {
             $pathInfo = substr_replace($pathInfo, '', strpos($pathInfo, '?'));
         }
