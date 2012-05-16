@@ -8,9 +8,9 @@ The API can be used to retrieve a verified email address.
 To use from your application:
 
     <?php
-        require_once "/path/to/php-browserid/lib/BrowserID.php";
+        require_once "/path/to/php-browserid/lib/BrowserIDVerifier.php";
 
-        $auth = new BrowserID();
+        $auth = new BrowserIDVerifier();
         $email = $auth->authenticate();
 
         echo $email;
