@@ -1,5 +1,5 @@
 <?php
-require_once("lib/BrowserID.php");
-$p = new BrowserID();
+require_once("lib/BrowserIDVerifier.php");
+$p = new BrowserIDVerifier();
 $p->linkback();
 ?>
