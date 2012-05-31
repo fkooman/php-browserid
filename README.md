@@ -10,11 +10,21 @@ To use from your application:
     <?php
         require_once "/path/to/php-browserid/lib/BrowserIDVerifier.php";
 
-        $auth = new BrowserIDVerifier();
-        $email = $auth->authenticate();
-
-        echo $email;
+	    $auth = new BrowserIDVerifier();
+	    try { 
+            $email = $auth->authenticate();
+            echo $email;
+        } catch (BrowserIDException $e) {
+            die($e->getMessage());
+        }
     ?>
 
-That's all! The library will take care of the redirects required
-and verifying the BrowserID response.
+If you want to require a specific email address the authenticate call can be
+given an optional parameter:
+
+    $email = $auth->authenticate("user@example.org");
+
+This will preselect the email address and require the user to use this address.
+
+That's all! The library will take care of the redirects required and verifying 
+the BrowserID response.

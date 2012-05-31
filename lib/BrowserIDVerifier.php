@@ -1,5 +1,9 @@
 <?php
 
+class BrowserIDException extends Exception {
+
+}
+
 class BrowserIDVerifier {
 
     private $_verifyUri;
@@ -9,14 +13,33 @@ class BrowserIDVerifier {
         session_start();
     }
 
-    public function authenticate() {
-        if(array_key_exists("browser_id", $_SESSION)) {
-            if($_SESSION["browser_id"]['status'] === 'okay') {
-                return $_SESSION["browser_id"]['email'];
+    public function authenticate($requiredEmail = NULL) {
+        if(array_key_exists("browser_id", $_SESSION) && array_key_exists("return_uri", $_SESSION)) {
+            // there was already an attempt at authentication...
+            if($_SESSION["browser_id"]['status'] === 'failure') {
+                // but it didn't succeed
+                $error = $_SESSION['browser_id']['reason'];
+                unset($_SESSION['browser_id']);
+                unset($_SESSION['return_uri']);
+                throw new BrowserIDException("authentication failure: $error");
             }
+            // authentication succeeded
+            if(NULL !== $requiredEmail && $requiredEmail !== $_SESSION['browser_id']['email']) {
+                // but someone authenticated with an unexpected address
+                unset($_SESSION['browser_id']);
+                unset($_SESSION['return_uri']);
+                throw new BrowserIDException("authentication failure: wrong address");
+            }
+            // FIXME: make sure it didn't expire!
+            return $_SESSION["browser_id"]['email'];
         } else {
+            // no previous authentication attempt
             $_SESSION["return_uri"] = self::getCallUri();
-            header("Location: " . self::getAuthUri());
+            $authUri = self::getAuthUri();
+            if(NULL !== $requiredEmail) {
+                $authUri .= "#required_email=" . $requiredEmail;
+            }
+            header("Location: " . $authUri);
             exit;
         }
     }
@@ -41,18 +64,15 @@ class BrowserIDVerifier {
             curl_setopt($ch, CURLOPT_POST, 2);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
             $result = json_decode(curl_exec($ch), TRUE);
+            // FIXME: deal with cURL errors
             curl_close($ch);
-            $result["return_uri"] = $_SESSION["return_uri"];
-            if($result['status'] === "okay") {
-                $_SESSION["browser_id"] = $result;
-            }
+            $_SESSION["browser_id"] = array_merge($result, array("return_uri" => $_SESSION['return_uri']));
         }
         header("Content-Type: application/json");
         echo json_encode($_SESSION["browser_id"]);
     }
 
     // HELPER FUNCTIONS TO DETERMINE URLs
-
     public static function getAudience() {
         return $_SERVER['SERVER_NAME'];
     }
