@@ -24,7 +24,7 @@ class BrowserIDVerifier {
                 throw new BrowserIDException("authentication failure: $error");
             }
             // authentication succeeded
-            if(NULL !== $requiredEmail && $requiredEmail !== $_SESSION['browser_id']['email']) {
+            if(NULL !== $requiredEmail && strcasecmp($requiredEmail, $_SESSION['browser_id']['email']) !== 0) {
                 // but someone authenticated with an unexpected address
                 unset($_SESSION['browser_id']);
                 unset($_SESSION['return_uri']);
