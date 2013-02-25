@@ -1,6 +1,6 @@
 $(function () {
 
-    $('#browserid').click(function () {
+    $('#persona').click(function () {
         var p, h = window.location.hash;
         if (h.length >= 2 && h.indexOf("required_email") !== -1) {
             h = h.substring(1);

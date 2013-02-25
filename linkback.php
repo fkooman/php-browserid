@@ -1,5 +1,4 @@
 <?php
-require_once("lib/BrowserIDVerifier.php");
-$p = new BrowserIDVerifier();
+require_once 'lib/PersonaVerifier.php';
+$p = new PersonaVerifier();
 $p->linkback();
-?>
